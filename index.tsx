@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as THREE from 'three';
-import { Trophy, Play, Pause, RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Info, Mail, Ghost, Keyboard, Music, Volume2, VolumeX, Settings, ArrowRightLeft, Zap, Gamepad2, Timer, MousePointer2 } from 'lucide-react';
+import { Trophy, Play, Pause, RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Info, Mail, Ghost, Keyboard, Music, Volume2, VolumeX, Settings, ArrowRightLeft, Zap, Gamepad2, Timer, MousePointer2, Flame, Utensils } from 'lucide-react';
 
 // --- Game Constants & Types ---
 const GRID_SIZE = 30;
@@ -1385,24 +1385,32 @@ const App = () => {
         }}>
           <div style={{
             background: 'linear-gradient(135deg, #1e1e2f 0%, #101015 100%)',
-            padding: '40px', borderRadius: '20px', border: '2px solid #00FFFF',
-            boxShadow: '0 0 30px rgba(0, 255, 255, 0.3)', maxWidth: '600px', width: '90%', textAlign: 'center'
+            padding: '50px', borderRadius: '25px', border: '2px solid #00FFFF',
+            boxShadow: '0 0 40px rgba(0, 255, 255, 0.25)', maxWidth: '700px', width: '90%', textAlign: 'center'
           }}>
-            <h1 style={{ fontSize: '3.5rem', margin: '0 0 10px 0', fontFamily: 'Impact, sans-serif', letterSpacing: '2px', background: 'linear-gradient(to right, #ff9966, #ff5e62)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 style={{ fontSize: '4rem', margin: '0 0 10px 0', fontFamily: 'Impact, sans-serif', letterSpacing: '3px', background: 'linear-gradient(to right, #ff9966, #ff5e62)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0px 0px 5px rgba(255,94,98,0.5))' }}>
               3D HOTDOG
             </h1>
-            <p style={{ color: '#aaa', margin: '0 0 30px 0', fontSize: '1.2rem' }}>Arcade Snack Attack</p>
+            <p style={{ color: '#aaa', margin: '0 0 40px 0', fontSize: '1.3rem', letterSpacing: '1px' }}>Arcade Snack Attack</p>
 
-            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginBottom: '30px', flexWrap: 'wrap' }}>
-                <div style={cardStyle}>
-                   <h3 style={{color: '#4dabf7', margin: '0 0 10px 0'}}>OBJECTIVE</h3>
+            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginBottom: '40px', flexWrap: 'wrap' }}>
+                
+                {/* Objective Card */}
+                <div style={objectiveCardStyle}>
+                   <h3 style={{color: '#4dabf7', margin: '0 0 15px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                       OBJECTIVE <Info size={18}/>
+                   </h3>
                    <div style={instrRow}><span style={{color: '#FF4500'}}>●</span> Eat Hotdogs (+100)</div>
                    <div style={instrRow}><span style={{color: '#DC143C'}}>●</span> Eat Fries (+150)</div>
                    <div style={instrRow}><span style={{color: '#FFF'}}>●</span> Avoid Walls & Self</div>
                    <div style={instrRow}><span style={{color: '#FFD700'}}>●</span> Survive Timer to Level Up</div>
                 </div>
-                <div style={cardStyle}>
-                   <h3 style={{color: '#e599f7', margin: '0 0 10px 0'}}>POWER-UPS</h3>
+
+                {/* Powerups Card */}
+                <div style={powerUpCardStyle}>
+                   <h3 style={{color: '#e599f7', margin: '0 0 15px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                       POWER-UPS <Zap size={18}/>
+                   </h3>
                    <div style={instrRow}><span style={{color: '#FFD700'}}>■</span> Mustard: +500 Pts</div>
                    <div style={instrRow}><span style={{color: '#00FFFF'}}>●</span> Ghost: Pass thru Self</div>
                    <div style={instrRow}><span style={{color: '#FF4500'}}>🍔</span> Burger: Speed Boost</div>
@@ -1413,21 +1421,21 @@ const App = () => {
               PLAY GAME (F1)
             </button>
             
-            <div style={{ marginTop: '20px', fontSize: '0.9rem', color: '#666', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-               <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', alignItems: 'center' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Keyboard size={14}/> WASD / ARROWS</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><MousePointer2 size={14}/> TOUCH CONTROLS</span>
+            <div style={{ marginTop: '30px', fontSize: '1rem', color: '#888', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+               <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', alignItems: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '5px 10px', borderRadius: '5px' }}><Keyboard size={16}/> WASD / ARROWS</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '5px 10px', borderRadius: '5px' }}><MousePointer2 size={16}/> TOUCH CONTROLS</span>
                </div>
-               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                  <span>F2: Restart</span> <span>F3: Pause</span> <span>F4: Mute</span>
+               <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+                  <span><b style={{color:'white'}}>F2:</b> Restart</span> <span><b style={{color:'white'}}>F3:</b> Pause</span> <span><b style={{color:'white'}}>F4:</b> Mute</span>
                </div>
             </div>
 
             {highScores.length > 0 && (
-                <div style={{ marginTop: '20px', borderTop: '1px solid #333', paddingTop: '10px' }}>
+                <div style={{ marginTop: '25px', borderTop: '1px solid #333', paddingTop: '15px' }}>
                     <h4 style={{ margin: '0 0 10px 0', color: '#FFD700' }}>HIGH SCORES</h4>
                     {highScores.slice(0, 3).map((hs, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', width: '60%', margin: '0 auto', color: '#ccc' }}>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', width: '50%', margin: '0 auto', color: '#ccc' }}>
                             <span>{i+1}. {hs.name}</span>
                             <span>{hs.score}</span>
                         </div>
@@ -1512,16 +1520,32 @@ const btnStyle: React.CSSProperties = {
 const megaBtnStyle: React.CSSProperties = {
     background: 'linear-gradient(90deg, #FFD700, #FF8C00, #FF4500)',
     color: 'black',
-    border: 'none',
+    border: '2px solid white',
     padding: '20px 60px',
     fontSize: '2rem',
     fontWeight: '900',
     fontFamily: 'Arial Black, sans-serif',
     cursor: 'pointer',
     borderRadius: '50px',
-    boxShadow: '0 0 20px rgba(255, 140, 0, 0.6)',
+    boxShadow: '0 0 25px rgba(255, 69, 0, 0.6)',
     transition: 'transform 0.2s',
     textTransform: 'uppercase'
+};
+
+const objectiveCardStyle: React.CSSProperties = {
+    background: 'linear-gradient(160deg, rgba(30, 60, 114, 0.4) 0%, rgba(42, 82, 152, 0.2) 100%)',
+    border: '1px solid rgba(77, 171, 247, 0.4)',
+    boxShadow: '0 0 15px rgba(77, 171, 247, 0.1)',
+    padding: '20px', borderRadius: '15px', textAlign: 'left', width: '220px',
+    backdropFilter: 'blur(5px)'
+};
+
+const powerUpCardStyle: React.CSSProperties = {
+    background: 'linear-gradient(160deg, rgba(80, 20, 100, 0.4) 0%, rgba(60, 20, 80, 0.2) 100%)',
+    border: '1px solid rgba(229, 153, 247, 0.4)',
+    boxShadow: '0 0 15px rgba(229, 153, 247, 0.1)',
+    padding: '20px', borderRadius: '15px', textAlign: 'left', width: '220px',
+    backdropFilter: 'blur(5px)'
 };
 
 const controlBtnStyle: React.CSSProperties = {
@@ -1534,12 +1558,8 @@ const iconBtnStyle: React.CSSProperties = {
     background: 'rgba(0,0,0,0.5)', border: 'none', color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer'
 };
 
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '10px', textAlign: 'left', width: '200px'
-};
-
 const instrRow: React.CSSProperties = {
-    display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', fontSize: '0.9rem', color: '#ddd'
+    display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '0.95rem', color: '#e0e0e0'
 };
 
 const root = createRoot(document.getElementById('root')!);
