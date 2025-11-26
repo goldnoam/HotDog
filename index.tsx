@@ -1312,7 +1312,7 @@ const App = () => {
       }
       
       if (gameStateRef.current === 'START' || gameStateRef.current === 'GAME_OVER') {
-          if (e.code === 'Space' || e.key === 'Enter' || e.key === 'F1') {
+          if (e.code === 'Space' || e.key === 'Enter') {
               startGame();
           }
           return;
@@ -1418,7 +1418,7 @@ const App = () => {
             </div>
 
             <button onClick={startGame} style={megaBtnStyle}>
-              PLAY GAME (F1)
+              PLAY GAME (F2)
             </button>
             
             <div style={{ marginTop: '30px', fontSize: '1rem', color: '#888', display: 'flex', flexDirection: 'column', gap: '8px' }}>
