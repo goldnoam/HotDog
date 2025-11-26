@@ -160,6 +160,8 @@ const App = () => {
   const ghostModeEndTimeRef = useRef<number>(0);
   const speedBoostEndTimeRef = useRef<number>(0);
   const dogPulseEndTimeRef = useRef<number>(0);
+  const goldenFriesEndTimeRef = useRef<number>(0);
+
   const lastMoveTimeRef = useRef(0);
   const moveIntervalRef = useRef(200); 
   const baseLevelSpeedRef = useRef(200);
@@ -511,6 +513,7 @@ const App = () => {
     const isGhost = ghostRemaining > 0;
     const pulseRemaining = dogPulseEndTimeRef.current - now;
     const isPulsing = pulseRemaining > 0;
+    const isGolden = now < goldenFriesEndTimeRef.current;
     
     // Spawn Ghost Particles
     if (isGhost && snakeMeshesRef.current.length > 0) {
@@ -560,6 +563,10 @@ const App = () => {
             const pulse = 0.5 + Math.sin(now * 0.02) * 0.5;
             emissiveColor = 0xFFD700; 
             emissiveIntensity = pulse * 0.8;
+        } else if (isGolden) {
+             emissiveColor = 0xFFD700;
+             emissiveIntensity = 0.5 + Math.sin(now * 0.01) * 0.3;
+             baseColor = 0xFFD700;
         }
 
         obj.traverse((child) => {
@@ -572,7 +579,7 @@ const App = () => {
                 material.opacity = opacity;
                 
                 if (material.type === 'MeshStandardMaterial') {
-                    if (isPulsing) {
+                    if (isPulsing || isGolden) {
                         material.emissive.setHex(emissiveColor);
                         material.emissiveIntensity = emissiveIntensity;
                     } else {
@@ -583,6 +590,8 @@ const App = () => {
 
                 if (isGhost) {
                     material.color.setHex(baseColor);
+                } else if (isGolden) {
+                    material.color.setHex(0xFFD700);
                 } else {
                     material.transparent = false;
                     material.opacity = 1.0;
@@ -639,7 +648,13 @@ const App = () => {
 
       // Effects
       triggerFloatingFood(eatenFood.mesh.clone(), nextHead, 'FOOD');
-      spawnConfetti(nextHead, eatenFood.type === 'FRIES' ? new THREE.Color(COLORS.friesStrip) : new THREE.Color(COLORS.hotdog), 8);
+      const confettiColor = eatenFood.type === 'FRIES' ? new THREE.Color(COLORS.friesStrip) : new THREE.Color(COLORS.hotdog);
+      spawnConfetti(nextHead, confettiColor, 8);
+      
+      if (eatenFood.type === 'FRIES') {
+          goldenFriesEndTimeRef.current = Date.now() + 3000; // 3 Seconds of Golden Mode
+          spawnConfetti(nextHead, new THREE.Color(0xFFD700), 12);
+      }
       
       // Remove eaten food from scene and array
       sceneRef.current?.remove(eatenFood.mesh);
@@ -999,37 +1014,38 @@ const App = () => {
           headMain.name = 'headMain';
           group.add(headMain);
 
-          // Snout (More distinct)
-          const snoutGeo = new THREE.BoxGeometry(0.5, 0.45, 0.5);
+          // Snout (More distinct - Cylinder)
+          const snoutGeo = new THREE.CylinderGeometry(0.25, 0.35, 0.5, 12);
           const snoutMat = new THREE.MeshStandardMaterial({ color: COLORS.dogSnout });
           const snout = new THREE.Mesh(snoutGeo, snoutMat);
-          snout.position.set(0, -0.15, -0.65);
+          snout.rotation.x = -Math.PI / 2;
+          snout.position.set(0, -0.1, -0.65);
           snout.name = 'headSnout';
           group.add(snout);
 
           // Nose
-          const noseGeo = new THREE.BoxGeometry(0.25, 0.2, 0.15);
+          const noseGeo = new THREE.BoxGeometry(0.2, 0.15, 0.1);
           const noseMat = new THREE.MeshStandardMaterial({ color: COLORS.dogNose });
           const nose = new THREE.Mesh(noseGeo, noseMat);
-          nose.position.set(0, 0, -0.9);
+          nose.position.set(0, 0, -0.92);
           nose.name = 'headNose';
           group.add(nose);
           
-          // Ears (Floppy and larger)
-          const earGeo = new THREE.BoxGeometry(0.2, 0.8, 0.5);
+          // Ears (Floppy - Capsule/Cylinder)
+          const earGeo = new THREE.CapsuleGeometry(0.12, 0.5, 4, 8);
           const earMat = new THREE.MeshStandardMaterial({ color: COLORS.dogEar });
           
           const leftEar = new THREE.Mesh(earGeo, earMat);
-          leftEar.position.set(-0.55, 0.0, -0.1);
-          leftEar.rotation.z = 0.2; // Angle outwards
-          leftEar.rotation.y = -0.1;
+          leftEar.position.set(-0.55, 0.1, -0.1);
+          leftEar.rotation.z = 0.5; // Angle outwards
+          leftEar.rotation.x = 0.2;
           leftEar.name = 'headEar';
           group.add(leftEar);
           
           const rightEar = new THREE.Mesh(earGeo, earMat);
-          rightEar.position.set(0.55, 0.0, -0.1);
-          rightEar.rotation.z = -0.2; // Angle outwards
-          rightEar.rotation.y = 0.1;
+          rightEar.position.set(0.55, 0.1, -0.1);
+          rightEar.rotation.z = -0.5; // Angle outwards
+          rightEar.rotation.x = 0.2;
           rightEar.name = 'headEar';
           group.add(rightEar);
 
@@ -1115,8 +1131,8 @@ const App = () => {
   };
 
   const spawnFood = () => {
-    // Ensure we have (Level * 5) foods
-    const desiredCount = levelRef.current * 5;
+    // Ensure we have exactly 5 foods on screen
+    const desiredCount = 5;
     
     while (foodsRef.current.length < desiredCount) {
         const occupied = [
@@ -1236,6 +1252,7 @@ const App = () => {
         levelStartScoreRef.current = 0;
         ghostModeEndTimeRef.current = 0;
         speedBoostEndTimeRef.current = 0;
+        goldenFriesEndTimeRef.current = 0;
     }
     
     // Clear Queues
@@ -1480,6 +1497,18 @@ const App = () => {
                  MAIN MENU
               </button>
           </div>
+
+          {highScores.length > 0 && (
+              <div style={{ marginTop: '20px', background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '10px', width: '280px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#FFD700', textAlign: 'center', fontSize: '1.1rem', borderBottom: '1px solid #555', paddingBottom: '5px' }}>TOP SCORES</h4>
+                  {highScores.slice(0, 5).map((hs, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', color: '#ddd', fontSize: '0.95rem', padding: '3px 0' }}>
+                          <span>{i+1}. {hs.name}</span>
+                          <span>{hs.score}</span>
+                      </div>
+                  ))}
+              </div>
+          )}
         </div>
       )}
 
