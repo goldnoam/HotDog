@@ -12,9 +12,9 @@ const COLORS = {
   grid: 0x222222,
   dogHead: 0x8B4513, // SaddleBrown
   dogBody: 0xCD853F, // Peru
-  dogEar: 0x5D4037, // Darker Brown
-  dogSnout: 0xECCFA1, // Lighter/Tan
-  dogNose: 0x1A1A1A, // Almost Black
+  dogEar: 0x4A3026, // Darker Brown
+  dogSnout: 0xD2B48C, // Tan
+  dogNose: 0x111111, // Almost Black
   hotdog: 0xFF4500, // OrangeRed
   hotdogEmissive: 0xFF2200, 
   friesBox: 0xDC143C, // Crimson
@@ -540,8 +540,8 @@ const App = () => {
         if (index === snakeMeshesRef.current.length - 1) {
              const tailMesh = obj.getObjectByName("tailMesh");
              if (tailMesh) {
-                 const wagSpeed = 0.015;
-                 const wagAmount = 0.6;
+                 const wagSpeed = 0.02;
+                 const wagAmount = 0.8;
                  tailMesh.rotation.y = Math.sin(time * wagSpeed) * wagAmount; 
              }
         }
@@ -992,66 +992,69 @@ const App = () => {
           // Detailed Head Group
           const group = new THREE.Group();
           
-          // Skull
-          const headGeo = new THREE.BoxGeometry(0.8, 0.8, 1.0);
+          // Skull (Rounded Box or Sphere)
+          const headGeo = new THREE.BoxGeometry(0.85, 0.85, 0.9); // Slightly larger
           const headMat = new THREE.MeshStandardMaterial({ color: COLORS.dogHead });
           const headMain = new THREE.Mesh(headGeo, headMat);
           headMain.name = 'headMain';
           group.add(headMain);
 
-          // Snout
-          const snoutGeo = new THREE.BoxGeometry(0.6, 0.5, 0.4);
+          // Snout (More distinct)
+          const snoutGeo = new THREE.BoxGeometry(0.5, 0.45, 0.5);
           const snoutMat = new THREE.MeshStandardMaterial({ color: COLORS.dogSnout });
           const snout = new THREE.Mesh(snoutGeo, snoutMat);
-          snout.position.set(0, -0.1, -0.6);
+          snout.position.set(0, -0.15, -0.65);
           snout.name = 'headSnout';
           group.add(snout);
 
           // Nose
-          const noseGeo = new THREE.BoxGeometry(0.2, 0.2, 0.1);
+          const noseGeo = new THREE.BoxGeometry(0.25, 0.2, 0.15);
           const noseMat = new THREE.MeshStandardMaterial({ color: COLORS.dogNose });
           const nose = new THREE.Mesh(noseGeo, noseMat);
-          nose.position.set(0, 0, -0.8);
+          nose.position.set(0, 0, -0.9);
           nose.name = 'headNose';
           group.add(nose);
           
-          // Ears
-          const earGeo = new THREE.BoxGeometry(0.2, 0.6, 0.4);
+          // Ears (Floppy and larger)
+          const earGeo = new THREE.BoxGeometry(0.2, 0.8, 0.5);
           const earMat = new THREE.MeshStandardMaterial({ color: COLORS.dogEar });
+          
           const leftEar = new THREE.Mesh(earGeo, earMat);
-          leftEar.position.set(-0.5, 0.2, -0.2);
-          leftEar.rotation.z = -0.3;
+          leftEar.position.set(-0.55, 0.0, -0.1);
+          leftEar.rotation.z = 0.2; // Angle outwards
+          leftEar.rotation.y = -0.1;
           leftEar.name = 'headEar';
           group.add(leftEar);
           
           const rightEar = new THREE.Mesh(earGeo, earMat);
-          rightEar.position.set(0.5, 0.2, -0.2);
-          rightEar.rotation.z = 0.3;
+          rightEar.position.set(0.55, 0.0, -0.1);
+          rightEar.rotation.z = -0.2; // Angle outwards
+          rightEar.rotation.y = 0.1;
           rightEar.name = 'headEar';
           group.add(rightEar);
 
           // Eyes
-          const eyeGeo = new THREE.PlaneGeometry(0.2, 0.2);
-          const eyeMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF }); // Basic material for eyes to avoid lighting issues
+          const eyeGeo = new THREE.PlaneGeometry(0.25, 0.25);
+          const eyeMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF }); 
           const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-          leftEye.position.set(-0.25, 0.2, -0.51);
+          leftEye.position.set(-0.25, 0.2, -0.46); // Slightly forward
           leftEye.name = 'eyeWhite';
           group.add(leftEye);
 
           const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-          rightEye.position.set(0.25, 0.2, -0.51);
+          rightEye.position.set(0.25, 0.2, -0.46);
           rightEye.name = 'eyeWhite';
           group.add(rightEye);
           
-          const pupilGeo = new THREE.PlaneGeometry(0.1, 0.1);
+          const pupilGeo = new THREE.PlaneGeometry(0.12, 0.12);
           const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
           const leftPupil = new THREE.Mesh(pupilGeo, pupilMat);
-          leftPupil.position.set(-0.25, 0.2, -0.52);
+          leftPupil.position.set(-0.25, 0.2, -0.47);
           leftPupil.name = 'eyePupil';
           group.add(leftPupil);
           
           const rightPupil = new THREE.Mesh(pupilGeo, pupilMat);
-          rightPupil.position.set(0.25, 0.2, -0.52);
+          rightPupil.position.set(0.25, 0.2, -0.47);
           rightPupil.name = 'eyePupil';
           group.add(rightPupil);
 
@@ -1065,8 +1068,9 @@ const App = () => {
           mesh = group;
 
       } else {
-        // Body Segment
-        const geo = new THREE.SphereGeometry(0.45, 16, 16);
+        // Body Segment - Smoother connections
+        // Overlap spheres slightly (radius > 0.5) to look connected
+        const geo = new THREE.SphereGeometry(0.55, 32, 32); 
         const mat = new THREE.MeshStandardMaterial({ color: COLORS.dogBody });
         mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(segment.x, 0.5, segment.z);
@@ -1091,11 +1095,12 @@ const App = () => {
             else if (dz === 1) tailPivot.rotation.y = 0;
             else if (dz === -1) tailPivot.rotation.y = Math.PI;
             
-            const tailGeo = new THREE.ConeGeometry(0.15, 0.6, 8);
+            // Refined Tail Geometry
+            const tailGeo = new THREE.ConeGeometry(0.18, 0.7, 16);
             const tailMat = new THREE.MeshStandardMaterial({ color: COLORS.dogBody });
             const tailMesh = new THREE.Mesh(tailGeo, tailMat);
-            tailMesh.rotation.x = -Math.PI / 2 + 0.5; // Slight up angle
-            tailMesh.position.z = -0.4;
+            tailMesh.rotation.x = -Math.PI / 2 + 0.3; // Angle up
+            tailMesh.position.z = -0.45; // Start inside body
             tailMesh.name = "tailMesh"; // Tag for animation
             
             tailPivot.add(tailMesh);
